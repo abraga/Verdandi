@@ -4,7 +4,7 @@
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
-group = "com.github.abraga"
+group = "io.github.abraga"
 version = providers.gradleProperty("verdandi.version").get()
 
 plugins {
@@ -62,7 +62,7 @@ dependencies {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
-    coordinates("com.github.abraga", "verdandi", version.toString())
+    coordinates("io.github.abraga", "verdandi", version.toString())
 
     pom {
         name.set("Verdandi")
@@ -96,7 +96,7 @@ androidComponents {
     finalizeDsl {
         it.compileSdk = 36
         it.minSdk = 26
-        it.namespace = "com.github.abraga.verdandi"
+        it.namespace = "io.github.abraga.verdandi"
         it.optimization.consumerKeepRules.apply {
             publish = true
             files.add(project.file("consumer-rules.pro"))
