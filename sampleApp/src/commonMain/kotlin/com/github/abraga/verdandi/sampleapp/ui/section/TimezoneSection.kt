@@ -68,7 +68,7 @@ fun TimezoneSection(
     val inputShape = remember { RoundedCornerShape(ShowcaseTokens.Radius.Sm) }
     val addButtonShape = remember { RoundedCornerShape(ShowcaseTokens.Radius.Sm) }
 
-    ShowcaseSection(title = "Timezones", modifier = modifier) {
+    ShowcaseSection(title = "Timezones ($now)", modifier = modifier) {
         timezoneDisplays.forEach { (label, _, formattedTime) ->
             ShowcaseInfoRow(label = label, value = formattedTime)
         }

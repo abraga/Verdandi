@@ -18,7 +18,7 @@ fun FormatExplorerSection(
 ) {
     var formatPattern by remember { mutableStateOf("") }
 
-    ShowcaseSection(title = "Format Explorer", modifier = modifier) {
+    ShowcaseSection(title = "Format Explorer ($now)", modifier = modifier) {
         PatternFormatEditor(
             pattern = formatPattern,
             referenceMoment = now,

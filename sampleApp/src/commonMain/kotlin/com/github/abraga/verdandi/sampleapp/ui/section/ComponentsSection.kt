@@ -40,7 +40,7 @@ fun ComponentsSection(
         resolveComponent(now, selectedField)
     }
 
-    ShowcaseSection(title = "Components", modifier = modifier) {
+    ShowcaseSection(title = "Components ($now)", modifier = modifier) {
         val selectorShape = remember { RoundedCornerShape(ShowcaseTokens.Radius.Sm) }
 
         Column {
@@ -97,7 +97,9 @@ fun ComponentsSection(
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(ShowcaseTokens.Spacing.Xs))
+
         ShowcaseInfoRow(
             label = selectedField.label,
             value = componentValue
@@ -128,6 +130,7 @@ private fun resolveComponent(moment: VerdandiMoment, field: MomentComponentField
         MomentComponentField.UTC_OFFSET -> moment.component.offset.toString().ifEmpty { "UTC+00:00" }
     }
 }
+
 private enum class MomentComponentField(val label: String) {
     YEAR("Year"),
     MONTH("Month"),
