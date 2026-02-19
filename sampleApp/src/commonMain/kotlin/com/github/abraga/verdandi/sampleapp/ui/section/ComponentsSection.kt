@@ -1,18 +1,17 @@
-package com.github.abraga.verdandi.sampleapp.ui.section
+﻿package com.github.abraga.verdandi.sampleapp.ui.section
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,7 +36,6 @@ fun ComponentsSection(
 ) {
     var selectedField by remember { mutableStateOf(MomentComponentField.YEAR) }
     var dropdownExpanded by remember { mutableStateOf(false) }
-
     val componentValue = remember(now, selectedField) {
         resolveComponent(now, selectedField)
     }
@@ -45,14 +43,14 @@ fun ComponentsSection(
     ShowcaseSection(title = "Components", modifier = modifier) {
         val selectorShape = remember { RoundedCornerShape(ShowcaseTokens.Radius.Sm) }
 
-        Box {
+        Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(selectorShape)
                     .background(ShowcaseTokens.Palette.glassSurface)
                     .border(1.dp, ShowcaseTokens.Palette.glassBorder, selectorShape)
-                    .clickable { dropdownExpanded = true }
+                    .clickable { dropdownExpanded = !dropdownExpanded }
                     .padding(ShowcaseTokens.Spacing.Sm),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -64,42 +62,48 @@ fun ComponentsSection(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "▾",
+                    text = if (dropdownExpanded) "▴" else "▾",
                     color = ShowcaseTokens.Palette.textTertiary,
                     fontSize = ShowcaseTokens.Typography.BodySmall
                 )
             }
 
-            DropdownMenu(
-                expanded = dropdownExpanded,
-                onDismissRequest = { dropdownExpanded = false }
-            ) {
-                MomentComponentField.entries.forEach { field ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = field.label,
-                                fontSize = ShowcaseTokens.Typography.BodySmall
-                            )
-                        },
-                        onClick = {
-                            selectedField = field
-                            dropdownExpanded = false
-                        }
-                    )
+            AnimatedVisibility(visible = dropdownExpanded) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(selectorShape)
+                        .background(ShowcaseTokens.Palette.glassSurface)
+                        .border(1.dp, ShowcaseTokens.Palette.glassBorder, selectorShape)
+                ) {
+                    MomentComponentField.entries.forEach { field ->
+                        Text(
+                            text = field.label,
+                            color = if (field == selectedField)
+                                ShowcaseTokens.Palette.textPrimary
+                            else
+                                ShowcaseTokens.Palette.textSecondary,
+                            fontSize = ShowcaseTokens.Typography.BodySmall,
+                            fontWeight = if (field == selectedField) FontWeight.Medium else FontWeight.Normal,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedField = field
+                                    dropdownExpanded = false
+                                }
+                                .padding(ShowcaseTokens.Spacing.Sm)
+                        )
+                    }
                 }
             }
         }
-
         Spacer(modifier = Modifier.height(ShowcaseTokens.Spacing.Xs))
-
         ShowcaseInfoRow(
             label = selectedField.label,
             value = componentValue
         )
     }
 }
-
 private fun resolveComponent(moment: VerdandiMoment, field: MomentComponentField): String {
     return when (field) {
         MomentComponentField.YEAR -> moment.component.year.value.toString()
@@ -124,7 +128,6 @@ private fun resolveComponent(moment: VerdandiMoment, field: MomentComponentField
         MomentComponentField.UTC_OFFSET -> moment.component.offset.toString().ifEmpty { "UTC+00:00" }
     }
 }
-
 private enum class MomentComponentField(val label: String) {
     YEAR("Year"),
     MONTH("Month"),
