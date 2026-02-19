@@ -9,6 +9,7 @@
 [![Linux](https://img.shields.io/badge/Linux-✓-FCC624)](#)
 [![Wasm/JS](https://img.shields.io/badge/Wasm%2FJS-✓-778FFE)](#)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/Docs-GitHub%20Pages-blue)](https://abraga.github.io/Verdandi/)
 
 A date & time DSL for KMP (Kotlin Multiplatform). Type-safe, immutable, reads like plain English.
 
