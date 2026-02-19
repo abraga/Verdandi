@@ -121,10 +121,10 @@ moment format "EEEE, MMMM dd, yyyy"        // "Sunday, June 15, 2026"
 | `yyyy` / `yy`         | Year (4 / 2 digits)           | `2026` / `26`            |
 | `MMMM` / `MMM` / `MM` | Month (full / abbr / padded)  | `January` / `Jan` / `01` |
 | `dd` / `d`            | Day (padded / variable)       | `09` / `9`               |
-| `EEEE` / `EEE`        | Weekday (full / abbr)         | `Monday` / `Mon`         |
+| `EEEE` / `EEE` / `E`  | Weekday (full / abbr / digit) | `Monday` / `Mon` / `1`   |
 | `HH` / `hh`           | Hour (0-23 / 1-12)            | `14` / `02`              |
 | `mm` / `ss` / `SSS`   | Minute / Second / Millisecond | `05` / `09` / `456`      |
-| `a`                   | AM/PM                         | `PM`                     |
+| `A`                   | AM/PM                         | `PM`                     |
 | `Q`                   | Quarter                       | `2`                      |
 | `Z`                   | UTC offset                    | `+09:00` / `Z`           |
 
@@ -145,6 +145,7 @@ tomorrow.isTomorrow()
 tomorrow.isToday()
 tomorrow.isWeekend()
 tomorrow isSameDayAs now
+moment.wasYesterday()
 
 moment1 isBefore moment2
 moment1 isAfter moment2
@@ -243,7 +244,7 @@ recurrence.matches(someMoment)
 
 // Exclusions
 recurrence.exclude(holiday)
-recurrence.exclude(listOf(holiday1, holiday2))
+recurrence.exclude(holiday1, holiday2, ...)
 ```
 
 </details>
