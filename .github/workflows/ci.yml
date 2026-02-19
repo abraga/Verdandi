@@ -24,7 +24,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build
-        run: ./gradlew assemble
+        run: ./gradlew assemble -x :sampleApp:assemble -x :sampleAndroidApp:assemble
 
       - name: Run JVM tests
         run: ./gradlew jvmTest
