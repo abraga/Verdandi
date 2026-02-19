@@ -35,6 +35,8 @@ kotlin {
 
     sourceSets {
         commonMain {
+            kotlin.srcDir("src/common/kotlin")
+            resources.srcDir("src/common/resources")
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation(libs.compose.runtime)
@@ -45,8 +47,12 @@ kotlin {
                 implementation(libs.compose.components.ui.tooling.preview)
             }
         }
-        commonTest.dependencies {
-            implementation(kotlin("test"))
+        commonTest {
+            kotlin.srcDir("src/commonTest/kotlin")
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.compose.runtime)
+            }
         }
     }
 
