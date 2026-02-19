@@ -19,7 +19,7 @@ fun NowSection(
     val simpleDateTime = remember(now) { VerdandiShowcaseUsages.formatDateTimeSimple(now) }
     val time = remember(now) { VerdandiShowcaseUsages.formatTime(now) }
 
-    ShowcaseSection(title = "Now", modifier = modifier) {
+    ShowcaseSection(title = "Selected moment", modifier = modifier) {
         ShowcaseInfoRow(label = "Full date", value = fullDate)
         ShowcaseInfoRow(label = "Short date", value = shortDate)
         ShowcaseInfoRow(label = "Date & time", value = dateTime)

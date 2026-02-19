@@ -198,6 +198,20 @@ object VerdandiShowcaseUsages {
         return moment.component.monthName
     }
 
+    /**
+     * Get hour (0-23)
+     */
+    fun getHour(moment: VerdandiMoment): Int {
+        return moment.component.hour.value
+    }
+
+    /**
+     * Get minute (0-59)
+     */
+    fun getMinute(moment: VerdandiMoment): Int {
+        return moment.component.minute.value
+    }
+
     // endregion
 
     // region Intervals - Working with date ranges

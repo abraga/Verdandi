@@ -1,6 +1,7 @@
 package com.github.abraga.verdandi.sampleapp.ui.component
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -38,9 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -51,14 +50,9 @@ import com.github.abraga.verdandi.sampleapp.state.CalendarState
 import com.github.abraga.verdandi.sampleapp.theme.ShowcaseTokens
 
 private val calendarDayShape = RoundedCornerShape(ShowcaseTokens.Radius.Sm)
-private val todayHighlightBrush = Brush.radialGradient(
-    colors = listOf(
-        ShowcaseTokens.Palette.accent.copy(alpha = 0.4f),
-        ShowcaseTokens.Palette.accent.copy(alpha = 0.1f)
-    )
-)
-private val todayBorderColor = ShowcaseTokens.Palette.accent.copy(alpha = 0.6f)
-private val todayGlowColor = ShowcaseTokens.Palette.accentGlow
+private val selectedBgColor = ShowcaseTokens.Palette.accent.copy(alpha = 0.85f)
+private val selectedBorderColor = ShowcaseTokens.Palette.accent
+private val todayBorderColor = ShowcaseTokens.Palette.accent.copy(alpha = 0.45f)
 
 @Composable
 fun CalendarViewer(
@@ -66,7 +60,8 @@ fun CalendarViewer(
     state: CalendarState,
     onPreviousMonth: () -> Unit = {},
     onNextMonth: () -> Unit = {},
-    onToday: () -> Unit = {}
+    onToday: () -> Unit = {},
+    onDayClick: ((Int) -> Unit)? = null
 ) {
     var epochSnapshot by remember { mutableLongStateOf(state.displayedMoment.inMilliseconds) }
     val currentEpoch = state.displayedMoment.inMilliseconds
@@ -189,6 +184,8 @@ fun CalendarViewer(
                             week.forEach { day ->
                                 CalendarDayCell(
                                     day = day,
+                                    isSelected = day.isCurrentMonth && day.dayNumber == state.selectedDayNumber,
+                                    onDayClick = onDayClick,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
@@ -251,39 +248,87 @@ private fun NavigationButton(
 @Composable
 private fun CalendarDayCell(
     day: CalendarDay,
+    isSelected: Boolean,
+    onDayClick: ((Int) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
-    val textColor = when {
-        day.isToday -> ShowcaseTokens.Palette.textPrimary
-        day.isCurrentMonth -> ShowcaseTokens.Palette.textSecondary
-        else -> ShowcaseTokens.Palette.textMuted
-    }
+    val animSpec = spring<Float>(
+        dampingRatio = Spring.DampingRatioMediumBouncy,
+        stiffness = Spring.StiffnessMediumLow
+    )
 
-    val fontWeight = if (day.isToday) FontWeight.Bold else FontWeight.Normal
+    val selectedAlpha by animateFloatAsState(
+        targetValue = if (isSelected) 1f else 0f,
+        animationSpec = animSpec,
+        label = "selectedAlpha"
+    )
+
+    val todayAlpha by animateFloatAsState(
+        targetValue = if (day.isToday && !isSelected) 1f else 0f,
+        animationSpec = animSpec,
+        label = "todayAlpha"
+    )
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.6f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessHigh
+        ),
+        label = "dayCellScale"
+    )
+
+    val textColor by animateColorAsState(
+        targetValue = when {
+            isSelected -> ShowcaseTokens.Palette.textPrimary
+            day.isToday -> ShowcaseTokens.Palette.textPrimary
+            day.isCurrentMonth -> ShowcaseTokens.Palette.textSecondary
+            else -> ShowcaseTokens.Palette.textMuted
+        },
+        animationSpec = tween(300),
+        label = "textColorAnim"
+    )
+
+    val fontWeight = if (isSelected || day.isToday) FontWeight.Bold else FontWeight.Normal
+
+    val clickableModifier = if (day.isCurrentMonth && onDayClick != null) {
+        Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) { onDayClick(day.dayNumber) }
+    } else {
+        Modifier
+    }
 
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .padding(2.dp),
+            .padding(2.dp)
+            .scale(scale)
+            .then(clickableModifier),
         contentAlignment = Alignment.Center
     ) {
-        if (day.isToday) {
+        if (selectedAlpha > 0f) {
             Box(
                 modifier = Modifier
                     .matchParentSize()
+                    .graphicsLayer { alpha = selectedAlpha }
                     .clip(calendarDayShape)
-                    .background(brush = todayHighlightBrush)
-                    .border(
-                        width = 1.dp,
-                        color = todayBorderColor,
-                        shape = calendarDayShape
-                    )
-                    .drawBehind {
-                        drawCircle(
-                            color = todayGlowColor,
-                            radius = size.minDimension * 0.7f
-                        )
-                    }
+                    .background(selectedBgColor)
+                    .border(1.dp, selectedBorderColor, calendarDayShape)
+            )
+        }
+
+        if (todayAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .graphicsLayer { alpha = todayAlpha }
+                    .clip(calendarDayShape)
+                    .border(1.dp, todayBorderColor, calendarDayShape)
             )
         }
 

@@ -39,16 +39,17 @@ fun VerdandiShowcaseScreen(
 ) {
     val now = remember { VerdandiShowcaseUsages.now() }
     var calendarDisplayedMoment by remember { mutableStateOf(now) }
+    var selectedMoment by remember { mutableStateOf(now) }
     var adjustedMoment by remember { mutableStateOf(now) }
 
-    val uiState = remember(calendarDisplayedMoment) {
-        ShowcaseStateFactory.create(now, calendarDisplayedMoment)
+    val uiState = remember(calendarDisplayedMoment, selectedMoment) {
+        ShowcaseStateFactory.create(now, calendarDisplayedMoment, selectedMoment)
     }
 
     ShowcaseBackground(modifier = modifier) {
         ShowcaseContent(
-            now = now,
             calendarState = uiState.calendar,
+            selectedMoment = selectedMoment,
             adjustedMoment = adjustedMoment,
             onPreviousMonth = {
                 calendarDisplayedMoment = VerdandiShowcaseUsages.subtractOneMonth(calendarDisplayedMoment)
@@ -59,6 +60,27 @@ fun VerdandiShowcaseScreen(
             onTodayCalendar = {
                 calendarDisplayedMoment = now
             },
+            onDaySelected = { day ->
+                val year = VerdandiShowcaseUsages.getYear(calendarDisplayedMoment)
+                val month = VerdandiShowcaseUsages.getMonth(calendarDisplayedMoment).value
+                val hour = VerdandiShowcaseUsages.getHour(selectedMoment)
+                val minute = VerdandiShowcaseUsages.getMinute(selectedMoment)
+                selectedMoment = VerdandiShowcaseUsages.createAt(year, month, day, hour, minute)
+            },
+            onHourChanged = { hour ->
+                val year = VerdandiShowcaseUsages.getYear(selectedMoment)
+                val month = VerdandiShowcaseUsages.getMonth(selectedMoment).value
+                val day = VerdandiShowcaseUsages.getDayOfMonth(selectedMoment)
+                val minute = VerdandiShowcaseUsages.getMinute(selectedMoment)
+                selectedMoment = VerdandiShowcaseUsages.createAt(year, month, day, hour, minute)
+            },
+            onMinuteChanged = { minute ->
+                val year = VerdandiShowcaseUsages.getYear(selectedMoment)
+                val month = VerdandiShowcaseUsages.getMonth(selectedMoment).value
+                val day = VerdandiShowcaseUsages.getDayOfMonth(selectedMoment)
+                val hour = VerdandiShowcaseUsages.getHour(selectedMoment)
+                selectedMoment = VerdandiShowcaseUsages.createAt(year, month, day, hour, minute)
+            },
             onAdjustMoment = { adjustedMoment = it },
             modifier = Modifier.align(Alignment.TopCenter)
         )
@@ -67,12 +89,15 @@ fun VerdandiShowcaseScreen(
 
 @Composable
 private fun ShowcaseContent(
-    now: VerdandiMoment,
     calendarState: CalendarState,
+    selectedMoment: VerdandiMoment,
     adjustedMoment: VerdandiMoment,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onTodayCalendar: () -> Unit,
+    onDaySelected: (Int) -> Unit,
+    onHourChanged: (Int) -> Unit,
+    onMinuteChanged: (Int) -> Unit,
     onAdjustMoment: (VerdandiMoment) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -88,32 +113,37 @@ private fun ShowcaseContent(
     ) {
         ShowcaseHeader()
 
-        NowSection(now = now)
-
         CalendarSection(
             calendarState = calendarState,
+            selectedHour = VerdandiShowcaseUsages.getHour(selectedMoment),
+            selectedMinute = VerdandiShowcaseUsages.getMinute(selectedMoment),
             onPreviousMonth = onPreviousMonth,
             onNextMonth = onNextMonth,
-            onTodayCalendar = onTodayCalendar
+            onTodayCalendar = onTodayCalendar,
+            onDaySelected = onDaySelected,
+            onHourChanged = onHourChanged,
+            onMinuteChanged = onMinuteChanged
         )
 
-        FormatExplorerSection(now = now)
+        NowSection(now = selectedMoment)
+
+        FormatExplorerSection(now = selectedMoment)
 
         AdjustmentsSection(
-            now = now,
+            now = selectedMoment,
             adjustedMoment = adjustedMoment,
             onAdjustMoment = onAdjustMoment
         )
 
-        ComponentsSection(now = now)
+        ComponentsSection(now = selectedMoment)
 
-        IntervalsSection(now = now)
+        IntervalsSection(now = selectedMoment)
 
-        RecurrenceSection(now = now)
+        RecurrenceSection(now = selectedMoment)
 
-        RelativeTimeSection(now = now)
+        RelativeTimeSection(now = selectedMoment)
 
-        TimezoneSection(now = now)
+        TimezoneSection(now = selectedMoment)
 
         Spacer(modifier = Modifier.height(ShowcaseTokens.Spacing.Xl))
     }

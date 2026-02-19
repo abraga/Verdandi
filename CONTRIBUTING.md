@@ -140,7 +140,7 @@ test: add DST fall-back edge case to DstTest
 ### Single test class
 
 ```bash
-./gradlew jvmTest --tests "com.github.abraga.verdandi.RecurrenceTest"
+./gradlew jvmTest --tests "io.github.abraga.verdandi.RecurrenceTest"
 ```
 
 ### Full build

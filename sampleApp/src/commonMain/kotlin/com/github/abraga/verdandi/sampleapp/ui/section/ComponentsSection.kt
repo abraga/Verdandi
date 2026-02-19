@@ -1,4 +1,4 @@
-﻿package com.github.abraga.verdandi.sampleapp.ui.section
+package com.github.abraga.verdandi.sampleapp.ui.section
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background

@@ -13,6 +13,7 @@ data class CalendarState(
     val weekdayHeaders: List<String>,
     val days: List<CalendarDay>,
     val displayedMoment: VerdandiMoment,
+    val selectedDayNumber: Int?,
     val isViewingCurrentMonth: Boolean = true
 )
 
@@ -26,16 +27,18 @@ object ShowcaseStateFactory {
 
     fun create(
         now: VerdandiMoment,
-        displayedMoment: VerdandiMoment
+        displayedMoment: VerdandiMoment,
+        selectedMoment: VerdandiMoment
     ): ShowcaseUiState {
         return ShowcaseUiState(
-            calendar = buildCalendarState(now, displayedMoment)
+            calendar = buildCalendarState(now, displayedMoment, selectedMoment)
         )
     }
 
     private fun buildCalendarState(
         now: VerdandiMoment,
-        displayedMoment: VerdandiMoment
+        displayedMoment: VerdandiMoment,
+        selectedMoment: VerdandiMoment
     ): CalendarState {
         val year = VerdandiShowcaseUsages.getYear(displayedMoment)
         val month = VerdandiShowcaseUsages.getMonth(displayedMoment)
@@ -43,6 +46,11 @@ object ShowcaseStateFactory {
         val nowYear = VerdandiShowcaseUsages.getYear(now)
         val nowMonth = VerdandiShowcaseUsages.getMonth(now)
         val todayDay = VerdandiShowcaseUsages.getDayOfMonth(now)
+
+        val selectedYear = VerdandiShowcaseUsages.getYear(selectedMoment)
+        val selectedMonth = VerdandiShowcaseUsages.getMonth(selectedMoment)
+        val selectedDay = VerdandiShowcaseUsages.getDayOfMonth(selectedMoment)
+        val isSelectedInThisMonth = selectedYear == year && selectedMonth.value == month.value
 
         val isCurrentMonth = year == nowYear && month.value == nowMonth.value
 
@@ -101,6 +109,7 @@ object ShowcaseStateFactory {
             weekdayHeaders = Verdandi.config.weekdayNames.map { it.take(3) },
             days = calendarDays,
             displayedMoment = displayedMoment,
+            selectedDayNumber = if (isSelectedInThisMonth) selectedDay else null,
             isViewingCurrentMonth = isCurrentMonth
         )
     }
