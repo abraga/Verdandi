@@ -51,10 +51,10 @@ val relative = now.relativeTo(event) format {
 
 ```kotlin
 dependencies {
-    implementation("com.github.abraga:verdandi:0.1.1")
+    implementation("io.github.abraga:verdandi:0.1.1")
 
     // Or for Compose projects:
-    implementation("com.github.abraga:verdandi-compose:0.1.1")
+    implementation("io.github.abraga:verdandi-compose:0.1.1")
 }
 ```
 
